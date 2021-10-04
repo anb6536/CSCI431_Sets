@@ -53,14 +53,14 @@ function find_card( fn_in )
     for idx = 1:max_num
         if idx ~= max_size_num
             sz          = size( im_sep );
-            solo_die    = zeros( sz );
+            solo_card    = zeros( sz );
             [r, c]  = find( im_sep == idx );
             rc      = [c r];
             for idx2 = 1:length(r)
-                solo_die( r(idx2), c(idx2) ) = 1;
+                solo_card( r(idx2), c(idx2) ) = 1;
             end
             ax(2) = subplot( 2, 2, 2 );
-            imagesc( solo_die );
+            imagesc( solo_card );
             axis image;
             colormap( ax(2), gray );
             hold on;
