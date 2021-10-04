@@ -1,12 +1,12 @@
 function Project_Sets()
     addpath( './Set_Cards' );
-    find_card( 'IMG_7534.JPG' );
+%     find_card( 'IMG_7534.JPG' );
     
-%     file_list   = dir( '../TEST_IMAGES/*.jpg' );
-%     for counter = 1 : length( file_list )
-%         figure();
-%         find_die( file_list( counter ).name );
-%     end
+    file_list   = dir( './Set_Cards/*.jpg' );
+    for counter = 1 : length( file_list )
+        figure();
+        find_card( file_list( counter ).name );
+    end
 end
 
 function find_card( fn_in )
