@@ -4,11 +4,12 @@ function Project_Sets()
     
     % Iterating over the list of images and calling the count function on
     % each of the image, creating a figure for each card
-    file_list   = dir( './Set_Cards/*.jpg' );
-    for counter = 1 : length( file_list )
-        figure();
-        find_card( file_list( counter ).name );
-    end
+%     file_list   = dir( './Set_Cards/*.jpg' );
+%     for counter = 1 : length( file_list )
+%         figure();
+%         find_card( file_list( counter ).name );
+%     end
+    find_card( 'IMG_7537.JPG' );
 end
 
 % find_card function takes in the image filename and does processing on it
@@ -42,6 +43,9 @@ function find_card( fn_in )
     % the regions and play with them
     im_sep      = bwlabel( im_new, 4 );
     
+    % Reporting the total number of cards in an image
+    fprintf( "Total number of cards: %d\n", max( im_sep, [], 'all' ) - 1 );
+    
     % Storing the max region number
     max_num     = max( im_sep, [], 'all' );
     
@@ -61,9 +65,6 @@ function find_card( fn_in )
         end
     end
     
-    % Reporting the total number of cards in an image
-    fprintf( "Total number of cards: %d\n", max( im_sep, [], 'all' ) - size(regions_to_ignore, 2) );
-
     % Converting the largest area to 0s so that they are black and not
     % counted as a region
     for img_col = 1: size( im_sep, 2 )
@@ -88,39 +89,40 @@ function find_card( fn_in )
         should_exec = true;
         % Ignoring the largest region and processing all the other regions
         for cell_count = 1:size(regions_to_ignore, 2)
-            if(idx == regions_to_ignore{1, cell_count})
+            if(idx == regions_to_ignore(1, cell_count))
                 should_exec = false;
             end
         end
-        if should_exec
-            % calculating the size of the image and creating a new image
-            % with 0s 
-            sz          = size( im_sep );
-            solo_card    = zeros( sz );
-            [sep_row, sep_col]  = find( im_sep == idx );
-            rc      = [sep_col sep_row];
-            % For all the rows and columns where an individual card is,
-            % converting that to a 1 (white) and showing the cards on the
-            % subplot one at a time
-            for idx2 = 1:length(sep_row)
-                solo_card( sep_row(idx2), sep_col(idx2) ) = 1;
+            if idx ~= regions_to_ignore{1, cell_count}
+                % calculating the size of the image and creating a new image
+                % with 0s 
+                sz          = size( im_sep );
+                solo_card    = zeros( sz );
+                [sep_row, sep_col]  = find( im_sep == idx );
+                rc      = [sep_col sep_row];
+                % For all the rows and columns where an individual card is,
+                % converting that to a 1 (white) and showing the cards on the
+                % subplot one at a time
+                for idx2 = 1:length(sep_row)
+                    solo_card( sep_row(idx2), sep_col(idx2) ) = 1;
+                end
+                
+                % Plotting the second image (with one card at a time) and
+                % displaying it on the 2x2 subplot at position 2.
+                ax(2) = subplot( 2, 2, 2 );
+                imagesc( solo_card );
+                axis image;
+                colormap( ax(2), gray );
+                hold on;
+    
+                % Using convex hull to draw an outline around the card
+                [k, ~]     = convhull(rc);
+                plot( rc(k, 1), rc(k, 2), 'c-', 'LineWidth', 1 );
+                hold off;
+    
+                % Adding a 1 sec pause between the images.
+                pause(1);
             end
-            
-            % Plotting the second image (with one card at a time) and
-            % displaying it on the 2x2 subplot at position 2.
-            ax(2) = subplot( 2, 2, 2 );
-            imagesc( solo_card );
-            axis image;
-            colormap( ax(2), gray );
-            hold on;
-
-            % Using convex hull to draw an outline around the card
-            [k, ~]     = convhull(rc);
-            plot( rc(k, 1), rc(k, 2), 'c-', 'LineWidth', 1 );
-            hold off;
-
-            % Adding a 1 sec pause between the images.
-            pause(1);
         end
     end
 end
