@@ -5,10 +5,11 @@ function Project_Sets()
     % Iterating over the list of images and calling the count function on
     % each of the image, creating a figure for each card
     file_list   = dir( './Set_Cards/*.jpg' );
-    for counter = 1 : length( file_list )
-        figure();
-        find_card( file_list( counter ).name );
-    end
+%     for counter = 1 : length( file_list )
+%         figure();
+%         find_card( file_list( counter ).name );
+%     end
+    find_card('IMG_7534.JPG');
 end
 
 % find_card function takes in the image filename and does processing on it
@@ -17,10 +18,14 @@ function find_card( fn_in )
 
     % Reading in the image and converting it to Double for all the
     % computations. 
-    im      = im2double( imread( fn_in ) );
+    im_og      = im2double( imread( fn_in ) );
+    
+    ax(1) = subplot( 2, 2, 1 );
+    imagesc( im_og );
+    axis image;
     
     % Using the red channel of the image to count the number of cards
-    im      = im(:,:,1);
+    im   = im_og(:,:,1);
     
     % Creating a gaussian filter and using it on the image to remove noise
     fltr    = fspecial('Gauss', 25, 15);
@@ -77,12 +82,13 @@ function find_card( fn_in )
     end
    
     % Ploting the image with the regions
-    ax(1) = subplot( 2, 2, 1 );
+    ax(2) = subplot( 2, 2, 2 );
     imagesc( im_sep );
     axis image;
     colormap ( ax(1), hot );
     colorbar;
     
+    card_num = 1;
     % Iterating over the number of regions
     for idx = 1:max_num
         should_exec = true;
@@ -106,18 +112,35 @@ function find_card( fn_in )
                 solo_card( sep_row(idx2), sep_col(idx2) ) = 1;
             end
             
+            [k, ~]     = convhull(rc);
+            conv_xs    = rc(k, 1);
+            conv_ys    = rc(k, 2);
+
+            min_x      = min(conv_xs(:));
+            max_x      = max(conv_xs(:));
+            min_y      = min(conv_ys(:));
+            max_y      = max(conv_ys(:));
+
+            solo_card_color = im_og(min_y:max_y, min_x:max_x, :);
+            shape_count = Count_Shape(solo_card_color);
+            card_texture = Classify_Texture(solo_card_color);
+            card_color = Classify_Color(solo_card_color);
+
             % Plotting the second image (with one card at a time) and
             % displaying it on the 2x2 subplot at position 2.
-            ax(2) = subplot( 2, 2, 2 );
+            ax(3) = subplot( 2, 2, 3 );
             imagesc( solo_card );
             axis image;
             colormap( ax(2), gray );
             hold on;
 
             % Using convex hull to draw an outline around the card
-            [k, ~]     = convhull(rc);
+            
             plot( rc(k, 1), rc(k, 2), 'c-', 'LineWidth', 1 );
             hold off;
+
+            fprintf("Card Num: %d, Color: %s, Number: %d, Shape: , Shading: %s\n", card_num, card_color, shape_count, card_texture);
+            card_num = card_num + 1;
 
             % Adding a 1 sec pause between the images.
             pause(1);
