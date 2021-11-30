@@ -132,6 +132,37 @@ function find_card( fn_in )
             card_texture = Classify_Texture(solo_card_color);
             card_color = Classify_Color(solo_card_color);
 
+            gray = rgb2gray(solo_card_color);
+            gray = gray - 150;
+           
+            % Binarize the im
+            bin_im = imbinarize(gray);
+            bin_im = imcomplement(bin_im);
+            regions = bwlabel(bin_im, 4);
+            max_reg = max(regions(:));
+            max_reg_ignore = 0;
+            max_reg_id = -1;
+            for reg = 1:max_reg
+                [max_row, max_col]  = find( regions == reg );
+                if(length(max_row) > max_reg_ignore)
+                    max_reg_ignore = length(max_row);
+                    max_reg_id = reg;
+                end
+            end
+            
+            new_img = zeros(size(solo_card_color, 1:2));
+            for reg = 1:max_reg
+                [max_row, max_col]  = find( regions == reg );
+                if(reg ~= max_reg_id)
+                    for px_idx = 1:length(max_row)
+                        new_img(max_row(px_idx), max_col(px_idx)) = 1;
+                    end
+                end
+            end
+
+            card_shape = Classify_Shape(new_img);
+            
+
             % Plotting the second image (with one card at a time) and
             % displaying it on the 2x2 subplot at position 2.
 %             ax(3) = subplot( 2, 2, 3 );
@@ -145,7 +176,7 @@ function find_card( fn_in )
 %             plot( rc(k, 1), rc(k, 2), 'c-', 'LineWidth', 1 );
 %             hold off;
 
-            fprintf("Card Num: %d, Color: %s, Number: %d, Shape: , Shading: %s\n", card_num, card_color, shape_count, card_texture);
+            fprintf("Card Num: %d, Color: %s, Number: %d, Shape: %s, Shading: %s\n", card_num, card_color, shape_count, card_shape, card_texture);
             card_num = card_num + 1;
 
             % Adding a 1 sec pause between the images.
