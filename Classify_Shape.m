@@ -3,8 +3,10 @@ function r_shape = Classify_Shape( im )
     % get image into binary image
     gray_im = rgb2gray(im);
     bin_im = imbinarize(gray_im);
-    se = strel('disk', 3);
+    se = strel('line', 5, 0);
     bin_im = imclose(bin_im, se);
+    se = strel('disk', 5);
+    bin_im = imopen(bin_im, se);
             
     % Edge detection
     edges = edge(bin_im, 'sobel');
@@ -38,6 +40,7 @@ function r_shape = Classify_Shape( im )
     end
     %}
     
+    
     % Calculate slope of all lines, check if parallel
     slopeArray = zeros([1, length(lines)]);
     for k = 1:length(lines)
@@ -45,7 +48,7 @@ function r_shape = Classify_Shape( im )
         y1 = lines(k).point1(2);
         x2 = lines(k).point2(1);
         y2 = lines(k).point2(2);
-        slopeArray(k) = (x2 - x1) / (y2 - y1);
+        slopeArray(k) = (y2 -y1) / (x2 - x1) ;
     end
     
     % disp(slopeArray);
@@ -66,7 +69,7 @@ function r_shape = Classify_Shape( im )
         end
         disp(highest);
         disp(lowest);
-        if( ( highest > 0 && lowest < 0) && ( highest - lowest > 3))
+        if( ( highest > 0 && lowest < 0) && ( highest - lowest > 0.2))
             r_shape = "diamond"; 
         else
             r_shape = "oval";
