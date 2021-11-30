@@ -3,8 +3,8 @@ function Find_Sets( fn_in )
     sets_found = {};
     set_count = 1;
     for card1 = 1:length(fn_in)
-        for card2 = 1:length(fn_in)
-            for card3 = 1:length(fn_in)
+        for card2 = card1:length(fn_in)
+            for card3 = card2:length(fn_in)
                 if card1 ~= card2 && card2 ~= card3 && card1 ~= card3
                     valid_count = 0;
                     if strcmp(fn_in{card1, 2}, fn_in{card2, 2}) && strcmp(fn_in{card2, 2}, fn_in{card3, 2}) ...
