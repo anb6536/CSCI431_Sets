@@ -18,14 +18,15 @@ function find_card( fn_in )
 
     % Reading in the image and converting it to Double for all the
     % computations. 
-    im_og      = im2double( imread( fn_in ) );
+    im_og      = imread( fn_in );
+    im         = im2double( im_og );
     
-    ax(1) = subplot( 2, 2, 1 );
-    imagesc( im_og );
-    axis image;
+%     ax(1) = subplot( 2, 2, 1 );
+%     imagesc( im_og );
+%     axis image;
     
     % Using the red channel of the image to count the number of cards
-    im   = im_og(:,:,1);
+    im   = im(:,:,1);
     
     % Creating a gaussian filter and using it on the image to remove noise
     fltr    = fspecial('Gauss', 25, 15);
@@ -82,11 +83,11 @@ function find_card( fn_in )
     end
    
     % Ploting the image with the regions
-    ax(2) = subplot( 2, 2, 2 );
-    imagesc( im_sep );
-    axis image;
-    colormap ( ax(1), hot );
-    colorbar;
+%     ax(2) = subplot( 2, 2, 2 );
+%     imagesc( im_sep );
+%     axis image;
+%     colormap ( ax(1), hot );
+%     colorbar;
     
     card_num = 1;
     % Iterating over the number of regions
@@ -122,28 +123,33 @@ function find_card( fn_in )
             max_y      = max(conv_ys(:));
 
             solo_card_color = im_og(min_y:max_y, min_x:max_x, :);
+
+            figure();
+            imagesc(solo_card_color);
+            axis image;
+
             shape_count = Count_Shape(solo_card_color);
             card_texture = Classify_Texture(solo_card_color);
             card_color = Classify_Color(solo_card_color);
 
             % Plotting the second image (with one card at a time) and
             % displaying it on the 2x2 subplot at position 2.
-            ax(3) = subplot( 2, 2, 3 );
-            imagesc( solo_card );
-            axis image;
-            colormap( ax(2), gray );
-            hold on;
+%             ax(3) = subplot( 2, 2, 3 );
+%             imagesc( solo_card );
+%             axis image;
+%             colormap( ax(2), gray );
+%             hold on;
 
             % Using convex hull to draw an outline around the card
             
-            plot( rc(k, 1), rc(k, 2), 'c-', 'LineWidth', 1 );
-            hold off;
+%             plot( rc(k, 1), rc(k, 2), 'c-', 'LineWidth', 1 );
+%             hold off;
 
             fprintf("Card Num: %d, Color: %s, Number: %d, Shape: , Shading: %s\n", card_num, card_color, shape_count, card_texture);
             card_num = card_num + 1;
 
             % Adding a 1 sec pause between the images.
-            pause(1);
+            pause(5);
         end
     end
 end
