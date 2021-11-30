@@ -21,9 +21,9 @@ function find_card( fn_in )
     im_og      = imread( fn_in );
     im         = im2double( im_og );
     
-%     ax(1) = subplot( 2, 2, 1 );
-%     imagesc( im_og );
-%     axis image;
+    ax(1) = subplot( 2, 2, 1 );
+    imagesc( im_og );
+    axis image;
     
     % Using the red channel of the image to count the number of cards
     im   = im(:,:,1);
@@ -83,13 +83,14 @@ function find_card( fn_in )
     end
    
     % Ploting the image with the regions
-%     ax(2) = subplot( 2, 2, 2 );
-%     imagesc( im_sep );
-%     axis image;
-%     colormap ( ax(1), hot );
-%     colorbar;
+    ax(2) = subplot( 2, 2, 2 );
+    imagesc( im_sep );
+    axis image;
+    colormap ( ax(2), hot );
+    colorbar;
     
     card_num = 1;
+    all_cards = {};
     % Iterating over the number of regions
     for idx = 1:max_num
         should_exec = true;
@@ -123,10 +124,6 @@ function find_card( fn_in )
             max_y      = max(conv_ys(:));
 
             solo_card_color = im_og(min_y:max_y, min_x:max_x, :);
-
-            figure();
-            imagesc(solo_card_color);
-            axis image;
 
             shape_count = Count_Shape(solo_card_color);
             card_texture = Classify_Texture(solo_card_color);
@@ -165,22 +162,35 @@ function find_card( fn_in )
 
             % Plotting the second image (with one card at a time) and
             % displaying it on the 2x2 subplot at position 2.
-%             ax(3) = subplot( 2, 2, 3 );
-%             imagesc( solo_card );
-%             axis image;
-%             colormap( ax(2), gray );
-%             hold on;
+            ax(3) = subplot( 2, 2, 3 );
+            imagesc( solo_card );
+            axis image;
+%             colormap( ax(3), gray );
+            hold on;
 
             % Using convex hull to draw an outline around the card
             
-%             plot( rc(k, 1), rc(k, 2), 'c-', 'LineWidth', 1 );
-%             hold off;
+            plot( rc(k, 1), rc(k, 2), 'c-', 'LineWidth', 1 );
+            hold off;
+
+            ax(4) = subplot( 2, 2, 4 );
+            imagesc(solo_card_color);
+            axis image;
 
             fprintf("Card Num: %d, Color: %s, Number: %d, Shape: %s, Shading: %s\n", card_num, card_color, shape_count, card_shape, card_texture);
+            
+            all_cards{card_num, 1} = card_num;
+            all_cards{card_num, 2} = card_color;
+            all_cards{card_num, 3} = shape_count;
+            all_cards{card_num, 4} = card_shape;
+            all_cards{card_num, 5} = card_texture;
             card_num = card_num + 1;
 
             % Adding a 1 sec pause between the images.
-            pause(5);
+%             pause(1);
         end
     end
+    
+    Find_Sets(all_cards);
+
 end
