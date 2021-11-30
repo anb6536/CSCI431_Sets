@@ -15,7 +15,7 @@ end
 % find_card function takes in the image filename and does processing on it
 % to count the number of set cards in the image.
 function find_card( fn_in )
-
+    fprintf("\nFile Name: %s\n", fn_in);
     % Reading in the image and converting it to Double for all the
     % computations. 
     im_og      = imread( fn_in );

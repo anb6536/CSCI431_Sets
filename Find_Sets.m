@@ -50,6 +50,7 @@ function Find_Sets( fn_in )
         end
     end
 
+    fprintf("\nAll Possible Sets in this Image: \n");
     for set_idx = 1:length(sets_found)
         fprintf("Set #%d: Card %d, Card %d, Card %d\n", set_idx, sets_found{set_idx, 1}, sets_found{set_idx, 2}, sets_found{set_idx, 3})
     end
