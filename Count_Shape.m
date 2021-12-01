@@ -4,9 +4,6 @@ function shape_count = Count_Shape( fn_in )
 
     im_bw   = fn_in(:,:,1);
 
-%     fltr    = fspecial('Gauss', 25, 15);
-%     im      = imfilter(im_bw, fltr);
-
     im_binary = imbinarize(im_bw);
     str_elem    = strel( 'disk', 7);
     im_new      = imerode( im_binary, str_elem );
