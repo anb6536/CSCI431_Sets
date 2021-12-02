@@ -5,11 +5,10 @@ function Project_Sets()
     % Iterating over the list of images and calling the count function on
     % each of the image, creating a figure for each card
     file_list   = dir( './Set_Cards/*.jpg' );
-%     for counter = 1 : length( file_list )
-%         figure();
-%         find_card( file_list( counter ).name );
-%     end
-    find_card('IMG_7540.JPG');
+    for counter = 1 : length( file_list )
+        figure();
+        find_card( file_list( counter ).name );
+    end
 end
 
 % find_card function takes in the image filename and does processing on it
