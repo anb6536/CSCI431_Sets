@@ -57,10 +57,7 @@ function r_string = Classify_Color(in_im)
             end
         end
     end
-    
-    % r_string = [ red green purple black white ];
-    
-    
+
     if red > green && red > purple
         r_string =  'Red';
     elseif green > red && green > purple

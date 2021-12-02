@@ -5,17 +5,16 @@ function Project_Sets()
     % Iterating over the list of images and calling the count function on
     % each of the image, creating a figure for each card
     file_list   = dir( './Set_Cards/*.jpg' );
-%     for counter = 1 : length( file_list )
-%         figure();
-%         find_card( file_list( counter ).name );
-%     end
-    find_card('IMG_7534.JPG');
+    for counter = 1 : length( file_list )
+        figure();
+        find_card( file_list( counter ).name );
+    end
 end
 
 % find_card function takes in the image filename and does processing on it
 % to count the number of set cards in the image.
 function find_card( fn_in )
-
+    fprintf("\nFile Name: %s\n", fn_in);
     % Reading in the image and converting it to Double for all the
     % computations. 
     im_og      = imread( fn_in );
@@ -114,27 +113,41 @@ function find_card( fn_in )
                 solo_card( sep_row(idx2), sep_col(idx2) ) = 1;
             end
             
+            % Finding the convex hull around each card and then extracting
+            % th x and the y values which is then used to crop the image
             [k, ~]     = convhull(rc);
             conv_xs    = rc(k, 1);
             conv_ys    = rc(k, 2);
 
+            % Finding the min and max column and row values from the convex
+            % hull x and ys and using that to crop the card out of the
+            % original image
             min_x      = min(conv_xs(:));
             max_x      = max(conv_xs(:));
             min_y      = min(conv_ys(:));
             max_y      = max(conv_ys(:));
 
+            % Cropped individual card image in RGB
             solo_card_color = im_og(min_y:max_y, min_x:max_x, :);
 
+            % Calling the functions to figure out the shape, texture and
+            % color of the individual card and storing the return values in
+            % a variable
             shape_count = Count_Shape(solo_card_color);
             card_texture = Classify_Texture(solo_card_color);
             card_color = Classify_Color(solo_card_color);
 
+            % Performing some operations on the image to get rid of the
+            % edges between the card and the black background to send it to
+            % the shape classifier
             gray = rgb2gray(solo_card_color);
             gray = gray - 150;
            
-            % Binarize the im
+            % Binarize the image and then complementing it
             bin_im = imbinarize(gray);
             bin_im = imcomplement(bin_im);
+
+            % Seperating the image into regions
             regions = bwlabel(bin_im, 4);
             max_reg = max(regions(:));
             max_reg_ignore = 0;
@@ -147,6 +160,9 @@ function find_card( fn_in )
                 end
             end
             
+            % After finding the card region from the image, turning it all
+            % into white so that the edges between the card and the black
+            % cloth dont exist anymore
             new_img = zeros(size(solo_card_color, 1:2));
             for reg = 1:max_reg
                 [max_row, max_col]  = find( regions == reg );
@@ -157,6 +173,7 @@ function find_card( fn_in )
                 end
             end
 
+            
             card_shape = Classify_Shape(new_img);
             
 
@@ -179,13 +196,18 @@ function find_card( fn_in )
 
             fprintf("Card Num: %d, Color: %s, Number: %d, Shape: %s, Shading: %s\n", card_num, card_color, shape_count, card_shape, card_texture);
             
-            all_cards{card_num} = [card_num, card_color, shape_count, card_shape, card_texture];
+            all_cards{card_num, 1} = card_num;
+            all_cards{card_num, 2} = card_color;
+            all_cards{card_num, 3} = shape_count;
+            all_cards{card_num, 4} = card_shape;
+            all_cards{card_num, 5} = card_texture;
             card_num = card_num + 1;
 
             % Adding a 1 sec pause between the images.
-            pause(1);
+%             pause(1);
         end
     end
+    
+    Find_Sets(all_cards);
 
-    disp("DONE");
 end

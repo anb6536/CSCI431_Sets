@@ -1,8 +1,6 @@
 function r_shape = Classify_Shape( im )
 
     % get image into binary image
-%     gray_im = rgb2gray(im);
-%     bin_im = imbinarize(gray_im);
     bin_im = im;
     se = strel('line', 5, 0);
     bin_im = imclose(bin_im, se);
@@ -52,8 +50,6 @@ function r_shape = Classify_Shape( im )
         slopeArray(k) = (y2 -y1) / (x2 - x1) ;
     end
     
-    % disp(slopeArray);
-    
     % If there are no lines, it's a squiggle
     if (length(lines) < 1)
         r_shape = "squiggle";
@@ -68,8 +64,7 @@ function r_shape = Classify_Shape( im )
                lowest = slopeArray(k);
             end
         end
-%         disp(highest);
-%         disp(lowest);
+
         if( ( highest > 0 && lowest < 0) && ( highest - lowest > 0.2))
             r_shape = "diamond"; 
         else
