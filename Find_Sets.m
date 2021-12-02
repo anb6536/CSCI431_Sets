@@ -75,7 +75,7 @@ function Find_Sets( fn_in )
     % Once we are done iterating over all the cards, loop over the found
     % sets and print them all out to the console.
     fprintf("\nAll Possible Sets in this Image: \n");
-    for set_idx = 1:length(sets_found)
+    for set_idx = 1:size(sets_found, 1)
         fprintf("Set #%d: Card %d, Card %d, Card %d\n", set_idx, sets_found{set_idx, 1}, sets_found{set_idx, 2}, sets_found{set_idx, 3})
     end
 end
